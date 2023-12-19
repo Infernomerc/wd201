@@ -1,38 +1,63 @@
-
 const todoList = () => {
-  all = []
+  all = [];
+
   const add = (todoItem) => {
-    all.push(todoItem)
-  }
+    all.push(todoItem);
+  };
+
   const markAsComplete = (index) => {
-    all[index].completed = true
-  }
+    all[index].completed = true;
+  };
 
   const overdue = () => {
-    const today = new Date().toISOString().split("T")[0];
-    return all.filter(item => item.dueDate < today);
-  }
+    const today = new Date();
+    // Filter items where the due date is in the past and not completed
+    return all.filter((item) => new Date(item.dueDate) < today && !item.completed);
+  };
 
   const dueToday = () => {
-    const today = new Date().toISOString().split("T")[0];
-    return all.filter(item =>item.dueDate === today);
-  }
+    const today = new Date();
+    // Filter items where the due date is equal to today's date and not completed
+    return all.filter((item) => {
+      const dueDate = new Date(item.dueDate);
+      return (
+        dueDate.getDate() === today.getDate() &&
+        dueDate.getMonth() === today.getMonth() &&
+        dueDate.getFullYear() === today.getFullYear() &&
+        !item.completed
+      );
+    });
+  };
 
   const dueLater = () => {
-    const today = new Date().toISOString().split("T")[0];
-    return all.filter(item =>  item.dueDate > today);
-  }
+    const today = new Date();
+    // Filter items where the due date is in the future and not completed
+    return all.filter((item) => new Date(item.dueDate) > today && !item.completed);
+  };
 
-  const todisplayList = (todoList ) => {
-    let displayList = "";
-    todoList .forEach(item => {
-      const status = item.completed ? "[x]" : "[ ]";
-      const title = item.title;
-      const dueDate = item.dueDate === today ? "" : ` ${item.dueDate}`;
-      displayList += `${status} ${title}${dueDate}\n`;
-    });
-    return displayList;
-  }
+  const toDisplayableList = (list) => {
+    // Format the To-Do list for display
+    return list
+      .map((item) => {
+        // Check if the item is due today
+        const today = new Date();
+        const dueDate = new Date(item.dueDate);
+
+        // Format the date based on whether it's due today or later
+        const formattedDate =
+          dueDate.getDate() === today.getDate() &&
+          dueDate.getMonth() === today.getMonth() &&
+          dueDate.getFullYear() === today.getFullYear()
+            ? ''
+            : dueDate.toISOString().split('T')[0];
+
+        // Create a displayable string for the item
+        return `${item.description}${
+          formattedDate !== '' ? ' - ' + formattedDate : ''
+        }${item.completed ? ' - Completed' : ''}`;
+      })
+      .join('\n');
+  };
 
   return {
     all,
@@ -41,11 +66,10 @@ const todoList = () => {
     overdue,
     dueToday,
     dueLater,
-    todisplayList
+    toDisplayableList,
   };
 };
 
-module.exports=todoList;
 const todos = todoList();
 
 const formattedDate = d => {
